@@ -1,0 +1,28 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Géolocatialisation</title>
+	<!-- Chargement de l'API Google maps -->
+
+</head>
+<body>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+
+<!-- Un élément HTML pour recueillir l’affichage -->
+<div id="infoposition"></div>
+<div id="map"></div>
+
+<script type="text/javascript" src="main.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtGzmwweMIkzL3rbhpGotrAOw3zGgkkCk&callback=initMap"
+    async defer></script>
+</body>
+</html>

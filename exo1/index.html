@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Exo 1</title>
+	</head>
+
+	<body>
+		<h2>Mon super cours <span class="small">v1</span></h2>
+		<h2>My awesome learning <span class="small">v2</span></h2>
+		<div id="date">
+		</div>
+		<div data-coordonne="">
+		</div>
+		<button onclick="displayHTwo()">!! Click ME !!</button>
+		<button onclick="displayDate()">Date</button>
+		<button onclick="giveCoordonne()">Coords</button>
+		<script type="text/javascript">
+			function displayHTwo() {
+				// alert(document.getElementsByTagName('h2')[0].childNodes[0]);
+
+				// var firstNode = document.getElementsByTagName('h2')[0];
+				// var firstSmall = firstNode.getElementsByClassName('small')[0];
+
+				// alert(firstSmall.innerText);
+				if(document.querySelector('h2 .small').style.color.toString().indexOf('black') !== -1) {
+
+					document.querySelector('h2 .small').style.color = 'red';
+				} else {
+					document.querySelector('h2 .small').style.color = 'black';
+				}
+			}
+
+			function displayDate() {
+
+				var date =  new Date();
+
+				document.getElementById('date').innerText = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+			}
+
+			
+			function giveCoordonne() {
+				//On récupère l'ensemble de l'élément.
+				var dataCoordonne = document.querySelector('[data-coordonne]');
+
+				var coordLit = { 
+									images: {  
+													image1 : { 
+														name : 'monImage1', 
+														coords : function () {
+																return [ [12, 12], [35, 65]];
+															} 
+													} ,
+													image2 : 
+													{ 
+														name : 'monImage1', 
+														coords : function () {
+																return [ [12, 12], [35, 65]];
+															} 
+													}
+											   
+											}
+								} ;
+
+				//Permet d'affecter des valeurs dans un tableau et les injecte dans un attribut 
+				alert("Before " + " : " + "\n" + dataCoordonne.dataset.coordonne);
+
+				//Parcours de chaque images
+				for (var image in coordLit.images) {
+					//Parcours de chaque coordonnée de chaque image
+					for (var i = coordLit.images[image].coords().length - 1; i >= 0; i--) {
+
+						dataCoordonne.dataset.coordonne += coordLit.images.image1.coords()[i] + ";"
+						
+					};
+				};
+
+				alert("After " + " : " + "\n" + dataCoordonne.dataset.coordonne);
+
+				//On peut afficher au sein du block de la balise le contenu d'ores-et-déjà présent au sein d'un attribut ayant 'data' suivie de texte tel que data-coucou-sa-va et 
+				//qui est accessible par sa valeur en camlCase like  dataCoordonne.dataset['coucouSaVa']
+				dataCoordonne.innerText = dataCoordonne.dataset['coordonne'];
+
+			}
+
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulaire validation</title>
+    <meta charset='utf-8'>
+</head>
+<body>
+    <form id="form" action="" method="POST" >
+        <label for="decalage" >
+            Décalage :
+            <input name="decalage" id="decalage" data-validate="numeric,required" type="text">
+        </label>
+        <label for="texte" >
+            Votre texte :
+            <input name="texte" id="texte" data-validate="required" type="text">
+        </label>
+        <input type="submit">
+    </form>
+    <script type="text/javascript">
+        var checkForm = function () {
+
+            var form = document.getElementById('form');
+            var decallage = document.getElementById('decalage');
+            var texte = document.getElementById('texte');
+
+            var formEls = [];
+
+            //Classe éléments
+            function Element(el, valid, name) {
+                this.name = name;
+                this.el = el;
+                this.valid = valid;
+                this.error = new Error();
+            }
+
+            //Classe error
+            function Error() {
+                this.errorMessage = [];
+            }
+
+            //Instantiation
+            texteEl2 = new Element(texte, false, 'texte');
+            decallageEl1 = new Element(decallage, false, 'decallage');
+
+
+            //Affectation
+            formEls.push(texteEl2);
+            formEls.push(decallageEl1);
+
+            //Evènement sur l'envoie du formulaire
+            form.addEventListener('submit', function (e) {
+                //Variable qui permet de vérifier que c'est valide
+                 var formValid = true;
+
+                //Same
+                console.log(e.target.childNodes[0]);
+                console.log(this.label);
+
+                
+                //On essaie de valider chaque champs
+                for(var el in formEls){
+                    // Je récupère l'entité HTML
+                    var elementHtml = formEls[el].el;
+
+                    validAll(formEls[el], elementHtml.dataset.validate);
+                }
+
+                //On vérifie que les élément sont passé au vert
+                for(var el in formEls) {
+                    if(formEls[el].valid === false) {
+                        formValid = false;
+                    } 
+                }
+
+                //Test de vérification si le formulaire est finalement valide !
+                if(formValid === true) {
+                    this.submit(); //ON envoie
+                    e.stopPropagation(); //On arrête l'évènement pour ne pas l'avoir de nouveau
+                } else {
+                    e.preventDefault(); //On arrête l'évènement submit du formulaire
+                  } 
+            });
+            // Création des évènements sur écoute du pressage des touches
+            for(var el in formEls){
+
+                createEvent(formEls, el);
+            }
+
+            //NECESSITE DE PASSE PAR UNE FONCTION NON ANO POUR UN EVENT
+            function createEvent(formEls, el) {
+
+                // Je récupère l'entité HTML
+                var elementHtml = formEls[el].el;
+
+                elementHtml.addEventListener('keyup', function (e) {
+                        console.log(formEls[el].el);
+                       validAll(formEls[el], elementHtml.dataset.validate);
+                    });
+            };
+
+            /**
+            * Fonction qui permet de valider l'élément avec ces caractéristique  et d'afficher les erreurs
+            */
+            var validAll = function(el, elValidate) {
+                    // On passe notre valeur en paramêtre
+                    //On recupère les valeur présente dans le data-validate
+
+
+                    //On vide les messages d'erreurs présents sur l'élément
+                    el.error.errorMessage = [];
+
+                    var valid = validator(el, elValidate);
+                       
+
+            };
+            
+            //Gestion dynamique, nul besoin de recréé une fonction par éléments
+            var validator = function (el, elValidate) {
+
+
+                var elValidateArr = elValidate.split(',');
+                var elValid = true;
+
+                for (var i = elValidateArr.length - 1; i >= 0; i--) {
+
+                    switch(elValidateArr[i]) {
+
+                        case 'required': {
+                             if(el.el.value === ""){
+                                el.error.errorMessage.push(el.name + " est requis !");
+                                 //TODO   elValid = false;
+                                elValid = false;
+                            } 
+                            break;
+                        }
+                        case 'numeric' : {
+
+                            // On vérifie que c'est bien un nombre
+                            if(isNaN(el.el.value)){
+                                el.error.errorMessage.push(el.name + " doit être un nombre !");
+                                elValid = false;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+
+                //On montre l'ensemble des erreur à chaque changement de champs
+                showError(el);
+                triggerValid(elValid, el);
+
+                return elValid;
+
+
+            }
+
+            //Fonction qui affiche les erreur
+            // @var Element el
+            var showError = function (el) {
+
+
+                for (var i = el.error.errorMessage.length - 1; i >= 0; i--) {                                
+                    alert(el.error.errorMessage[i]);
+                };
+            };
+
+            /**
+            * Fonction qui permet d'afficher des couleur autour des champs
+            *
+            * @var elValid boolean
+            * @var el element HTML
+            */
+            var triggerValid = function (elValid, el) {
+
+                //Element valide 
+                if(elValid === true){
+                    el.valid = true;
+
+                    // on vide les errors
+                   el.error.errorMessage = [];
+
+                   //On met une bordure de vert
+                   el.el.style.borderColor = 'green';
+                } else {
+                   el.valid = false; 
+
+                   //On met une bordure rouge
+                   el.el.style.borderColor = 'red';
+                } 
+            };
+
+    }; //End check form
+
+       
+
+        checkForm();
+    </script>
+</body>
+</html>

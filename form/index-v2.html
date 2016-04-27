@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulaire validation</title>
+    <meta charset='utf-8'>
+</head>
+<body>
+    <form id="form" action="" method="POST" >
+        <label for="decalage" >
+            Décalage :
+            <input name="decalage" id="decalage" type="text">
+        </label>
+        <label for="texte" >
+            Votre texte :
+            <input name="texte" id="texte" type="text">
+        </label>
+        <input type="submit">
+    </form>
+    <script type="text/javascript">
+        var checkForm = function () {
+
+            var form = document.getElementById('form');
+            var decallage = document.getElementById('decalage');
+            var texte = document.getElementById('texte');
+
+            var formEls = [];
+
+            //Classe éléments
+            function Element(el, valid) {
+                this.el = el;
+                this.valid = valid;
+                this.error = new Error();
+            }
+
+            //Classe error
+            function Error() {
+                this.errorMessage = [];
+            }
+
+            //Instantiation
+            texteEl2 = new Element(texte, false);
+            decallageEl1 = new Element(decallage, false);
+
+
+            //Affectation
+            formEls.push(texteEl2);
+            formEls.push(decallageEl1);
+
+            form.addEventListener('submit', function (e) {
+                //Variable qui permet de vérifier que c'est valide
+                 var formValid = true;
+
+                //Same
+                console.log(e.target.childNodes[0]);
+                console.log(this.label);
+
+
+                decallageValide(decallageEl1.el.value);
+                texteValide(texteEl2.el.value);
+
+                //On vérifie que les élément sont passé au vert
+                for(var el in formEls) {
+                    if(formEls[el].valid === false) {
+                        formValid = false;
+
+                        showError(formEls[el]);
+                    } 
+                }
+
+                //Test de vérification si le formulaire est finalement valide !
+                if(formValid === true) {
+                    this.submit(); //ON envoie
+                    e.stopPropagation(); //On arrête l'évènement pour ne pas l'avoir de nouveau
+                } else {
+                    e.preventDefault(); //On arrête l'évènement submit du formulaire
+                  } 
+            });
+            
+            
+            //Evènement lorsque l'on relache la touche sur le champs de décallage
+            decallageEl1.el.addEventListener('keyup', function (e) {
+                // On passe notre valeur en paramêtre
+                decallageValide(this.value);
+
+                //On montre l'ensemble des erreur à chaque changement de champs
+                showError(decallageEl1);
+                   
+            });
+
+            //Evènement lorsque l'on relache la touche sur le champs de décallage
+             texteEl2.el.addEventListener('keyup', function (e) {
+                // On passe notre valeur en paramêtre
+                texteValide(this.value);
+
+                //On montre l'ensemble des erreur à chaque changement de champs
+                showError(texteEl2);
+            });
+
+          var decallageValide = function (value) {
+
+            decallageEl1.error.errorMessage = [];
+            var elValid = true;
+
+            // On vérifie que la valeur n'est pas vide
+            if(value === ""){
+                decallageEl1.error.errorMessage.push("Saisissez une valeur dans décallage");
+                elValid = false;
+            } 
+
+            // On vérifie que c'est bien un nombre
+            if(isNaN(value)){
+
+                decallageEl1.error.errorMessage.push("Décallage doit être un nombre !");
+                elValid = false;
+            }
+
+            triggerValid(elValid, decallageEl1);
+        };
+
+
+        var texteValide = function(value) {
+
+              texteEl2.error.errorMessage = [];
+                //On vérifie qu'un caractère est saisie
+
+                var elValid = true;
+
+                if(value === ""){
+                    texteEl2.error.errorMessage.push("Saisissez une valeur dans texte");
+                    elValid = false;
+                }                
+                
+                triggerValid(elValid, texteEl2);
+            };
+
+        //Fonction qui affiche les erreur
+        // @var Element el
+        var showError = function (el) {
+
+
+            for (var i = el.error.errorMessage.length - 1; i >= 0; i--) {                                
+                alert(el.error.errorMessage[i]);
+            };
+        };
+
+        var triggerValid = function (elValid, el) {
+
+            //Element valide 
+            if(elValid === true){
+                el.valid = true;
+
+                // on vide les errors
+               el.error.errorMessage = [];
+
+               //On met une bordure de vert
+               el.el.style.borderColor = 'green';
+            } else {
+               el.valid = false; 
+
+               //On met une bordure rouge
+               el.el.style.borderColor = 'red';
+            } 
+        };
+
+    }; //End check form
+
+       
+
+        checkForm();
+    </script>
+</body>
+</html>

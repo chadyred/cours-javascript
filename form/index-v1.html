@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulaire validation</title>
+    <meta charset='utf-8'>
+</head>
+<body>
+    <form id="form" action="" method="POST" >
+        <label for="decalage" >
+            Décalage :
+            <input name="decalage" id="decalage" type="text">
+        </label>
+        <label for="texte" >
+            Votre texte :
+            <input name="texte" id="texte" type="text">
+        </label>
+        <input type="submit">
+    </form>
+    <script type="text/javascript">
+    	var checkForm = function () {
+
+    		var form = document.getElementById('form');
+    		var decallage = document.getElementById('decalage');
+    		var texte = document.getElementById('texte');
+
+    		form.addEventListener('submit', function (e) {
+    			//Variable qui permet de vérifier que c'est valide
+				var formValid = true;
+
+    			//Same
+    			console.log(e.target.childNodes[0]);
+    			console.log(this.label);
+
+
+    			if(decallage.value === ""){
+    				alert("Saisissez une valeur dans décallage");
+    				formValid = false;
+    			}
+
+    			if(isNaN(decallage.value)){
+    				alert("Décallage doit être un nombre !");
+    				formValid = false;
+    			}
+
+				if(texte.value === ""){
+    				alert("Saisissez une valeur dans texte");
+					formValid = false;
+				}
+
+
+    			if(formValid === true) {
+    			  this.submit(); 
+    			  e.stopPropagation(); 
+    			} else {
+    			  	e.preventDefault();
+    			  } 
+    		})
+
+    	};
+
+    	checkForm();
+    </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Chrono</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="bower_components/sweetalert/dist/sweetalert.css">
+	</head>
+
+	<body>
+		<h2>Mon super Chrono <span class="small">v1</span></h2>
+		<h2>My awesome timematching <span class="small">v2</span></h2>
+		<div id="date">
+		</div>
+		<button onclick="saveTime();saveData();beautiful();">Save</button>
+		<button onclick="reload();">Recharger la page</button>
+		<button onclick="redirect('google.com');">Go google !</button>
+		<div id="save" data-save="">
+			Temps retenu: 
+			<ul>
+			</ul>
+		</div>
+		<script type="text/javascript">
+
+		// (This is all presumably in some scoping function)
+
+			setInterval( function () {
+				displayDate();
+			}, 10);
+
+			var reload = function () {				
+				document.location.reload();
+			}
+
+			function displayDate() {
+
+				var date =  new Date();
+
+				var heures =  "0" + date.getHours();
+				var minutes =  "0" + date.getMinutes();
+				var secondes =  "0" + date.getSeconds();
+				var millisecondes =  "00" + date.getMilliseconds()
+
+				//On affiche uniquement les deux dernieres élément pour les hms et pour les ms on affiche les 3 derniers
+				document.getElementById('date').innerText = heures.toString().substr(heures.length - 2, 2) + ':' + minutes.substr(minutes.length - 2, 2) + ':' + secondes.substr(secondes.length - 2, 2) + ':' + millisecondes.substr(millisecondes.length - 3, 5);
+
+
+			}
+
+			function saveTime() {
+
+				// document.querySelector('#save ul').innerHTML += '<li>' + document.getElementById('date').innerText + '</li>';
+
+				var ulTarget = document.querySelector('#save ul');
+
+				var li = document.createElement('li');
+				var texte = document.createTextNode(document.getElementById('date').innerText);
+
+				li.appendChild(texte);
+				ulTarget.insertBefore(li, ulTarget.childNodes[0]);
+
+				swal("Good job!", "You time is save!", "success");
+
+			}
+
+			function saveData() {
+
+
+				var dataSave = document.querySelector('[data-save]');
+
+				dataSave.dataset['save'] += document.getElementById('date').innerText + ";";
+			}
+
+			function beautiful() {
+
+				//All pour avoir tout les élément HTML
+				var lisTarget = document.querySelectorAll('#save ul li');
+
+				console.log(lisTarget);
+
+				for (var i = lisTarget.length - 1; i >= 0; i--) {
+					lisTarget[i].style.color = 'blue';
+				};
+
+				var lastLi = document.querySelector('#save ul li:first-child');
+
+				lastLi.style.color = 'red';
+			}
+
+			function redirect(url) {
+				document.location.href = 'http://'+url;
+			}
+
+
+
+
+		</script>
+		<script type="text/javascript" src="bower_components/sweetalert/dist/sweetalert.min.js"></script>
+	</body>
+</html>
