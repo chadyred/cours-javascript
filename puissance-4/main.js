@@ -68,25 +68,24 @@ Couleur.prototype.ajouterJoueur = function(joueur) {
 	this.joueur = joueur;
 };
 
-//Fonction qui vérifie si dans la colonne il reste de la place et si oui, retourne
-//le x et retourn la Y position
-Plateau.prototype.checkColonne = function (x) {
+// CEtte fonction va retourner la hauteur (la ligne) pour une colonne donnée
+Plateau.prototype.checkColonne = function (y) {
 
-	var positionY = 0;
+	var positionX = 0;
 
 	for (var i = 0; i <= this.pions.length - 1; i++) {
-		if(this.pions[i].positionX === x){
+		if(this.pions[i].positionY == y){
 			console.log("Un pion dans la colonne! ");
-			positionY++;			
+			positionX++;			
 		}
 	};
 
 	//On vérifie que la position Y n'est pas égale à la postion X + 1
 	//MaxY est user friendly
-	if(positionY === (this.maxY ))
-		positionY = -1;
+	if(positionX === (this.maxX))
+		positionX = -1;
 
-	return positionY;
+	return positionX;
 }
 
 //Fonction qui permet d'intervertir les deux joueurs
@@ -119,6 +118,7 @@ Plateau.prototype.checkGrille = function () {
 
 					// console.log('Pions de couleur ' + this.pions[k].couleur.couleur +' en position [' + this.pions[k].positionX + '][' + this.pions[k].positionY + ']' );
 					this.grille[i][j] = this.pions[k].couleur;
+					break;
 				}
 				else{
 					// console.log('Position [' + i + '][' + j + '] vide');
@@ -136,17 +136,25 @@ Plateau.prototype.checkGrille = function () {
 		// BOucle du Y
 		for (var y = 0; y < this.maxY; y++) {
 			//Horizontal droite
+			var colonneDefine = typeof this.grille[x][y] !== "undefined" && typeof this.grille[x][y + 1] !=="undefined" && typeof this.grille[x][y + 2] !=="undefined" && typeof this.grille[x][y + 3] !=="undefined";
+			var colonneValid = colonneDefine && (this.grille[x][y].couleur == this.grille[x][y + 1].couleur == this.grille[x][y + 2].couleur == this.grille[x][y + 3].couleur);
 
 
-			// if(typeof this.grille[x][y] !== "undefined" && this.grille[x][y].couleur === this.grille[x + 1][y].couleur) {
-			// 	if(this.grille[x][y].couleur === this.grille[x + 2][y].couleur) {
-			// 		if(this.grille[x][y].couleur === this.grille[x + 3][y].couleur) {
-			// 			if(this.grille[x][y].couleur === this.grille[x + 4][y].couleur) {
-			// 			  alert('4 idem à droite');
-			// 			}
-			// 		}
-			// 	}
-			// }
+			var ligneDefine = typeof this.grille[x] !== "undefined" && typeof this.grille[x + 1] !=="undefined" && typeof this.grille[x + 2] !== "undefined" && typeof this.grille[x + 3] !== "undefined";
+			var ligneValid = ligneDefine && (this.grille[x][y].couleur == this.grille[x + 1][y].couleur == this.grille[x + 2][y].couleur == this.grille[x + 3][y].couleur);
+
+			console.log("colonneDefine : " + colonneDefine);
+			console.log("colonneValid : " + colonneValid);
+			console.log("ligneDefine : " + ligneDefine);
+			console.log("ligneValid : " + ligneValid);
+
+			if(colonneValid === true || colonneValid)
+				alert("Valid colonneValid");
+			
+
+			if(ligneValid === true || ligneValid)
+				alert("Valid ligneValid");
+
 		};
 	};
 
@@ -165,7 +173,7 @@ var jeu = {
 		console.log("Bienvenue dans le puissance 4 by " + this.author + " - version " + this.version);
 
 		//On créé le plateau
-		var lePlateau = this.plateau.create('grey', 7, 6);
+		var lePlateau = this.plateau.create('grey', 6, 7);
 
 		//On créer les eux couleur pour nos joueurs
 		var couleur1 = this.couleurs.create('jaune');
@@ -273,28 +281,29 @@ var jeu = {
 			/* Nettoyage du plateau */
 		},
 		reset: function () {
-			//Vide le plateau
+			//Vide le plateauvaleurElementClickY
 		},
-		check : function (plateau, x) {
+		check : function (plateau, y) {
 			//La possibilité d'ajouter ou non un pion( colonne plaine)
 
-			return plateau.checkColonne(x);
+			return plateau.checkColonne(y);
 
 		},
-		placerPion: function (x, plateau, couleur) {
+		//y est la colonne cliquer
+		placerPion: function (y, plateau, couleur) {
 			//Permet de placer le pion dans la x colonne sur le plateau par un joueur.
 
 				//On créé un pions avec la couleur du joueur
 			var pion = jeu.pions.create(couleur);
 
+			//Position du pion dans la colonne
+			var positionXPion = this.check(plateau, y);
 
-			var positionYPion = this.check(plateau, x);
-
-			if(positionYPion !== -1){
-				console.log("All good le pion sera placé en [" + x + "][" + positionYPion + "]");
+			if(positionXPion !== -1){
+				console.log("All good le pion sera placé en [" + positionXPion + "][" + y + "]");
 
 				// Le pion sera placer en x et Y
-				pion.move(x, positionYPion);
+				pion.move(positionXPion, y);
 
 				//On place le pion
 				plateau.ajouterPion(pion);
@@ -323,15 +332,15 @@ var jeu = {
 			container.style.border = 'solid black 2px';
 
 			//Taille du plateau selon le nombre de colonne
-			container.style.width = 40 * plateau.maxX + 'px';
-			container.style.height = 40 * plateau.maxY + 'px';
+			container.style.width = 40 * plateau.maxY + 'px';
+			container.style.height = 40 * plateau.maxX + 'px';
 
 
 
 			//Boucle du Y : ORDRE INVERSE IMORTANT on fait ligne par ligne
-			for (var i = plateau.maxY - 1; i >= 0; i--) {
+			for (var j = plateau.maxX - 1; j >= 0; j--) {
+				for (var i = plateau.maxY - 1; i >= 0; i--) {
 				// BOucle du X
-				for (var j = plateau.maxX - 1; j >= 0; j--) {
 					
 						var box = $.createElement('div');
 
@@ -346,11 +355,13 @@ var jeu = {
 
 						box.addEventListener('click', function(e) {
 
-							//On récupère la valeur du data X
-							var valeurElementClickX = parseInt(e.target.dataset['x']);
+							//On récupère la valeur du data y
+							var valeurElementClickY = parseInt(e.target.dataset['y']);
+
+							console.log("valeurElementClickY " + valeurElementClickY);
 
 							//On place la position cliqué dans le premiere argument
-							var pion = jeu.plateau.placerPion(valeurElementClickX, plateau, plateau.currentPlayer.couleur);
+							var pion = jeu.plateau.placerPion(valeurElementClickY, plateau, plateau.currentPlayer.couleur);
 
 							//On colorise la case
 							jeu.plateau.colorierCase(pion);

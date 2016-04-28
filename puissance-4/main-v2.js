@@ -20,6 +20,7 @@ function Plateau(couleur, maxX, maxY) {
 	this.maxX = maxX;
 	this.maxY = maxY;
 	this.joueurs = [];
+	this.grille = new Array();
 
 	//v1 premier créé, premier qui joue.
 	this.currentPlayer = null;
@@ -67,32 +68,88 @@ Couleur.prototype.ajouterJoueur = function(joueur) {
 	this.joueur = joueur;
 };
 
-//Fonction qui vérifie si dans la colonne il reste de la place et si oui, retourne
-//le x et retourn la Y position
-Plateau.prototype.checkColonne = function (x) {
+// CEtte fonction va retourner la hauteur (la ligne) pour une colonne donnée
+Plateau.prototype.checkColonne = function (y) {
 
-	var positionY = 0;
+	var positionX = 0;
 
 	for (var i = 0; i <= this.pions.length - 1; i++) {
-		if(this.pions[i].positionX === x){
+		if(this.pions[i].positionY == y){
 			console.log("Un pion dans la colonne! ");
-			positionY++;			
+			positionX++;			
 		}
 	};
 
 	//On vérifie que la position Y n'est pas égale à la postion X + 1
 	//MaxY est user friendly
-	if(positionY === (this.maxY ))
-		positionY = -1;
+	if(positionX === (this.maxX))
+		positionX = -1;
 
-	return positionY;
+	return positionX;
 }
 
+//Fonction qui permet d'intervertir les deux joueurs
 Plateau.prototype.switchCurrentPlayer = function () {
 	if (this.currentPlayer === this.joueurs[0])
 		this.currentPlayer = this.joueurs[1];
 	else 
 		this.currentPlayer = this.joueurs[0];
+
+}
+
+Plateau.prototype.checkGrille = function () {
+
+	var win = false;
+
+	console.log(this.pions);
+
+	//Boucle du X
+	for (var i = this.maxX - 1; i >= 0; i--) {
+		this.grille[i] = new Array();
+
+		// BOucle du Y
+		for (var j = this.maxY - 1; j >= 0; j--) {
+
+			//Boucle des pions sur le plateau
+			for (var k = 0; k < this.pions.length; k++) {
+
+				// On check chaque pions et sa position avec X et Y en cours
+				if (this.pions[k].positionX === i && this.pions[k].positionY === j){
+
+					// console.log('Pions de couleur ' + this.pions[k].couleur.couleur +' en position [' + this.pions[k].positionX + '][' + this.pions[k].positionY + ']' );
+					this.grille[i][j] = this.pions[k].couleur;
+					break;
+				}
+				else{
+					// console.log('Position [' + i + '][' + j + '] vide');
+					this.grille[i][j] = -1;
+				}
+
+			};
+		};
+	};
+
+	console.log(this.grille);
+	//Boucle du X
+	for (var x = 0; x < this.maxX; x++) {
+
+		// BOucle du Y
+		for (var y = 0; y < this.maxY; y++) {
+			//Horizontal droite
+
+
+			// if(typeof this.grille[x][y] !== "undefined" && this.grille[x][y].couleur === this.grille[x + 1][y].couleur) {
+			// 	if(this.grille[x][y].couleur === this.grille[x + 2][y].couleur) {
+			// 		if(this.grille[x][y].couleur === this.grille[x + 3][y].couleur) {
+			// 			if(this.grille[x][y].couleur === this.grille[x + 4][y].couleur) {
+			// 			  alert('4 idem à droite');
+			// 			}
+			// 		}
+			// 	}
+			// }
+		};
+	};
+
 
 }
 
@@ -127,9 +184,7 @@ var jeu = {
 		this.plateau.list(lePlateau);
 
 		// On place ce pion
-		this.plateau.placerPion(5, lePlateau, couleur1);
-
-		this.plateau.show(lePlateau);
+		// this.plateau.placerPion(5, lePlateau, couleur1);
 
 		alert("Commence " + lePlateau.currentPlayer.nom);
 		this.plateau.draw(lePlateau);
@@ -218,28 +273,29 @@ var jeu = {
 			/* Nettoyage du plateau */
 		},
 		reset: function () {
-			//Vide le plateau
+			//Vide le plateauvaleurElementClickY
 		},
-		check : function (plateau, x) {
+		check : function (plateau, y) {
 			//La possibilité d'ajouter ou non un pion( colonne plaine)
 
-			return plateau.checkColonne(x);
+			return plateau.checkColonne(y);
 
 		},
-		placerPion: function (x, plateau, couleur) {
+		//y est la colonne cliquer
+		placerPion: function (y, plateau, couleur) {
 			//Permet de placer le pion dans la x colonne sur le plateau par un joueur.
 
 				//On créé un pions avec la couleur du joueur
 			var pion = jeu.pions.create(couleur);
 
+			//Position du pion dans la colonne
+			var positionXPion = this.check(plateau, y);
 
-			var positionYPion = this.check(plateau, x);
-
-			if(positionYPion !== -1){
-				console.log("All good le pion sera placé en [" + x + "][" + positionYPion + "]");
+			if(positionXPion !== -1){
+				console.log("All good le pion sera placé en [" + positionXPion + "][" + y + "]");
 
 				// Le pion sera placer en x et Y
-				pion.move(x, positionYPion);
+				pion.move(positionXPion, y);
 
 				//On place le pion
 				plateau.ajouterPion(pion);
@@ -254,14 +310,6 @@ var jeu = {
 
 
 		}, 
-		win: function () {
-			//Fonction qui vérifie l'alignement des pions à chaque ajout ainsi que
-
-		}, 
-		loose: function () {
-			//Fonction qui vérifie s'il reste de la place 
-
-		},
 		draw: function(plateau) {
 
 			//Initalisation
@@ -276,15 +324,15 @@ var jeu = {
 			container.style.border = 'solid black 2px';
 
 			//Taille du plateau selon le nombre de colonne
-			container.style.width = 40 * plateau.maxX + 'px';
-			container.style.height = 40 * plateau.maxY + 'px';
+			container.style.width = 40 * plateau.maxY + 'px';
+			container.style.height = 40 * plateau.maxX + 'px';
 
 
 
 			//Boucle du Y : ORDRE INVERSE IMORTANT on fait ligne par ligne
-			for (var i = plateau.maxY - 1; i >= 0; i--) {
+			for (var j = plateau.maxX - 1; j >= 0; j--) {
+				for (var i = plateau.maxY - 1; i >= 0; i--) {
 				// BOucle du X
-				for (var j = plateau.maxX - 1; j >= 0; j--) {
 					
 						var box = $.createElement('div');
 
@@ -298,16 +346,24 @@ var jeu = {
 						box.setAttribute('data-y', i);
 
 						box.addEventListener('click', function(e) {
-							//On récupère la valeur du data Y
-							var valeurElementClickX = e.target.dataset['x'];
+
+							//On récupère la valeur du data y
+							var valeurElementClickY = parseInt(e.target.dataset['y']);
+
+							console.log("valeurElementClickY " + valeurElementClickY);
 
 							//On place la position cliqué dans le premiere argument
-							var pion = jeu.plateau.placerPion(valeurElementClickX, plateau, plateau.currentPlayer.couleur);
+							var pion = jeu.plateau.placerPion(valeurElementClickY, plateau, plateau.currentPlayer.couleur);
+
+							//On colorise la case
+							jeu.plateau.colorierCase(pion);
+
+							//Vérification grille
+							jeu.plateau.verifierGrille(plateau);
 
 							//Switch de joueur
 							jeu.plateau.interactionTour(plateau);
 
-							jeu.plateau.colorierCase(pion);
 
 						});
 
@@ -323,7 +379,7 @@ var jeu = {
 			alert("A toi de jouer" + plateau.currentPlayer.nom);
 		},
 		colorierCase : function(pion) {
-			alert('pion.positionX' + pion.positionX + "pion.positionY" + pion.positionY);
+			// alert('pion.positionX' + pion.positionX + "pion.positionY" + pion.positionY);
 			var box = document.querySelector('div[data-x="' + pion.positionX + '"][data-y="' + pion.positionY+ '"]');
 
 			switch (pion.couleur.couleur) {
@@ -337,20 +393,33 @@ var jeu = {
 					box.style.backgroundColor = 'white';
 					break;
 			}
+		},
+		//Fonction qui permet de vérifier la grille
+		verifierGrille: function(plateau) {
+			plateau.checkGrille();
 		}
 
 
 	},
 	score :  {
-		increment : function (joueur) {
+		increment : function (plateau) {
 			//Incrémente le score du joueur
+
 		},
 		show : function() {
 			//Montre l'ensemble des scores
 		},
 		reset : function () {
 			//remet à zéro les scores
-		}
+		},
+		win: function () {
+			//Fonction qui vérifie l'alignement des pions à chaque ajout ainsi que
+
+		}, 
+		loose: function () {
+			//Fonction qui vérifie s'il reste de la place 
+
+		},
 	}
 
 };
