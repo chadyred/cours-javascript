@@ -7,7 +7,7 @@ Author:  CELLIER Florian <cellier.florian@hotmail.fr>
 //Objet
 function Joueur(nom, couleur) {
 	this.nom = nom;
-	this.score = 0;
+	this.score = null;
 	this.couleur = couleur;
 
 	couleur.ajouterJoueur(this);
@@ -183,6 +183,14 @@ var jeu = {
 		var joueur1 = this.joueurs.create('jean',couleur1);
 		var joueur2 = this.joueurs.create('paul',couleur2);
 
+		//Création du score
+		var score1 = this.score.create();
+		var score2 = this.score.create();
+
+		// Affectation du score
+		joueur1.score = score1;
+		joueur2.score = score2;
+
 		this.plateau.addJoueur(lePlateau,joueur1);
 		this.plateau.addJoueur(lePlateau,joueur2);
 
@@ -195,8 +203,12 @@ var jeu = {
 		// this.plateau.placerPion(5, lePlateau, couleur1);
 
 		alert("Commence " + lePlateau.currentPlayer.nom);
+
+		//Affichage du plateau
 		this.plateau.draw(lePlateau);
 
+		//Affichage du score
+		this.score.draw(lePlateau);
 
 
 
@@ -222,7 +234,7 @@ var jeu = {
 			return new Joueur(nom, couleur);
 		},
 		show: function(joueur) {
-			//Permet de récupéré les informations sur un joueur
+			//Permet de récupérer les informations sur un joueur
 			console.log('========== INFORMATION JOUEUR =============');
 			console.log('Nom : ' + joueur.nom);
 			console.log('Couleur')
@@ -337,10 +349,11 @@ var jeu = {
 
 
 
-			//Boucle du Y : ORDRE INVERSE IMORTANT on fait ligne par ligne
+			//Boucle du X : ORDRE INVERSE IMORTANT on fait ligne par ligne
 			for (var j = plateau.maxX - 1; j >= 0; j--) {
+				// BOucle du Y
 				for (var i = plateau.maxY - 1; i >= 0; i--) {
-				// BOucle du X
+				
 					
 						var box = $.createElement('div');
 
@@ -384,23 +397,24 @@ var jeu = {
 		interactionTour : function (plateau) {			
 
 			jeu.joueurs.changerJoueur(plateau);
-			alert("A toi de jouer" + plateau.currentPlayer.nom);
+			alert("C'est au tour de : " + plateau.currentPlayer.nom);
 		},
 		colorierCase : function(pion) {
 			// alert('pion.positionX' + pion.positionX + "pion.positionY" + pion.positionY);
 			var box = document.querySelector('div[data-x="' + pion.positionX + '"][data-y="' + pion.positionY+ '"]');
-
-			switch (pion.couleur.couleur) {
-				case 'jaune':
-					box.style.backgroundColor = 'yellow';
-					break;
-				case 'rouge':
-					box.style.backgroundColor = 'red';
-					break;
-				default:
-					box.style.backgroundColor = 'white';
-					break;
-			}
+			
+				switch (pion.couleur.couleur) {
+					case 'jaune':
+						box.style.backgroundColor = 'yellow';
+						break;
+					case 'rouge':
+						box.style.backgroundColor = 'red';
+						break;
+					default:
+						box.style.backgroundColor = 'white';
+						break;
+				}
+			
 		},
 		//Fonction qui permet de vérifier la grille
 		verifierGrille: function(plateau) {
@@ -410,12 +424,28 @@ var jeu = {
 
 	},
 	score :  {
+		draw: function(plateau) {
+			var score1 = document.createElement('div');
+			var score2 = document.createElement('div');
+			var texteScore1 = document.createTextNode("Score  de "+ plateau.joueurs[0].nom + " : " + plateau.joueurs[0].score.point);
+			var texteScore2 = document.createTextNode("Score de "+ plateau.joueurs[1].nom + " : " + plateau.joueurs[1].score.point);
+
+			score1.appendChild(texteScore1);
+			score2.appendChild(texteScore2);
+
+			document.body.appendChild(score1);
+			document.body.appendChild(score2);
+		},
 		increment : function (plateau) {
 			//Incrémente le score du joueur
 
 		},
 		show : function() {
 			//Montre l'ensemble des scores
+		},
+		create : function() {
+			//Fonction qui permet de créer un score
+			return new Score();
 		},
 		reset : function () {
 			//remet à zéro les scores
